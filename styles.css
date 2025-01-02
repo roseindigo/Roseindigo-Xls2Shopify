@@ -42,6 +42,22 @@ input[type="text"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a light shadow */
 }
 
+
+textarea {
+  width: 100%;
+  height: 150px; /* Set a fixed height for better usability */
+  margin-bottom: 20px;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  font-family: monospace; /* Use a monospace font for alignment */
+  font-size: 14px; /* Adjust font size for readability */
+  padding: 10px; /* Add padding for better readability */
+  border: 1px solid #CCC; /* Add a subtle border */
+  border-radius: 5px; /* Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add light shadow */
+}
+
 /* Focus state for the input field */
 input[type="text"]:focus {
   border-color: #007BFF; /* Highlight border on focus */
