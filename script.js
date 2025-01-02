@@ -30,7 +30,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   }
 
   // Add missing columns if not present
-  if (!headers.includes('Image Position')) headers.push('Image Position');
+  // if (!headers.includes('Image Position')) headers.push('Image Position');
 
   const newRows = [];
   const tbody = previewTable.querySelector('tbody');
@@ -58,10 +58,11 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     images.forEach((image, index) => {
       if (index === 0) {
         // First image: Full row
+        row[imageSrcIndex] = image.trim(); // Update the 'Image Src' cell to contain only the first image
         row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
-        newRows.push(row.map(smartQuote).join(','));
-        addRowToTable(row);
-      } else {
+        newRows.push(row.map(smartQuote).join(',')); // Add the row to the CSV
+        addRowToTable(row); // Display the row in the preview table
+      }else {
         // Additional images: Minimal row, ensure no prices or costs
         const minimalRow = Array(headers.length).fill('');
         minimalRow[handleIndex] = handle;
