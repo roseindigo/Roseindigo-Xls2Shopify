@@ -1,10 +1,16 @@
 document.getElementById('generateCSV').addEventListener('click', () => {
   const inputData = document.getElementById('inputData').value;
+  const reference = document.getElementById('fileReference').value.trim();
   const previewTable = document.getElementById('previewTable');
   const downloadCSV = document.getElementById('downloadCSV');
 
   if (!inputData.trim()) {
-    alert('Please paste your data!');
+    alert('Veuillez coller vos données dans le champ prévu.');
+    return;
+  }
+
+  if (!reference) {
+    alert('Veuillez entrer une référence pour nommer le fichier.');
     return;
   }
 
@@ -19,7 +25,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const priceIndex = headers.indexOf('Variant Price');
 
   if (imageSrcIndex === -1 || handleIndex === -1) {
-    alert('Required columns (Handle, Image Src) not found!');
+    alert('Les colonnes obligatoires (Handle, Image Src) sont introuvables !');
     return;
   }
 
@@ -87,8 +93,19 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     return String(value).includes(',') ? `"${String(value).replace(/"/g, '""')}"` : value; // Quote if comma
   }
 
+  // Generate a file name based on the reference and the current date/time
+  const now = new Date();
+  const formattedDate = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+  const formattedTime = now.toTimeString().split(' ')[0]; // Format: HH:MM:SS
+  const sanitizedReference = reference.normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .replace(/[^a-zA-Z0-9-]/g, ''); // Remove special characters
+
+  const fileName = `${formattedDate}-${formattedTime}-${sanitizedReference}.csv`;
+
   // Set CSV data in the button's dataset
   downloadCSV.dataset.csvData = '\ufeff' + newRows.join('\n'); // Add BOM for UTF-8 encoding
+  downloadCSV.dataset.fileName = fileName;
 
   // Enable download button
   downloadCSV.disabled = false;
@@ -96,9 +113,10 @@ document.getElementById('generateCSV').addEventListener('click', () => {
 
 document.getElementById('downloadCSV').addEventListener('click', () => {
   const csvData = document.getElementById('downloadCSV').dataset.csvData;
+  const fileName = document.getElementById('downloadCSV').dataset.fileName;
 
-  if (!csvData) {
-    alert('No data available to download!');
+  if (!csvData || !fileName) {
+    alert('Données ou nom de fichier manquants !');
     return;
   }
 
@@ -108,7 +126,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'shopify_import.csv';
+  a.download = fileName;
   document.body.appendChild(a); // Append anchor to body
   a.click();
   document.body.removeChild(a); // Remove anchor after clicking
