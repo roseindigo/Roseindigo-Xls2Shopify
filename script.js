@@ -17,8 +17,6 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const handleIndex = headers.indexOf('Handle');
   const costIndex = headers.indexOf('Cost per item');
   const priceIndex = headers.indexOf('Variant Price');
-  const fulfillmentIndex = headers.indexOf('Fulfillment service');
-  const inventoryPolicyIndex = headers.indexOf('Inventory policy');
 
   if (imageSrcIndex === -1 || handleIndex === -1) {
     alert('Required columns (Handle, Image Src) not found!');
@@ -27,10 +25,8 @@ document.getElementById('generateCSV').addEventListener('click', () => {
 
   // Add missing columns if not present
   if (!headers.includes('Image Position')) headers.push('Image Position');
-  if (fulfillmentIndex === -1) headers.push('Fulfillment service');
-  if (inventoryPolicyIndex === -1) headers.push('Inventory policy');
 
-  const newRows = [headers.map(quoteValue).join(',')];
+  const newRows = [];
   const tbody = previewTable.querySelector('tbody');
   const thead = previewTable.querySelector('thead');
 
@@ -38,7 +34,8 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   thead.innerHTML = '';
   tbody.innerHTML = '';
 
-  // Create table headers
+  // Create table headers without quotes
+  newRows.push(headers.join(','));
   const headerRow = document.createElement('tr');
   headers.forEach(header => {
     const th = document.createElement('th');
@@ -56,23 +53,15 @@ document.getElementById('generateCSV').addEventListener('click', () => {
       if (index === 0) {
         // First image: Full row
         row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
-        row[costIndex] = row[costIndex] || '0'; // Default Cost per item
-        row[priceIndex] = row[priceIndex] || '0'; // Default Variant Price
-        row[fulfillmentIndex] = row[fulfillmentIndex] || 'manual'; // Default Fulfillment service
-        row[inventoryPolicyIndex] = row[inventoryPolicyIndex] || 'deny'; // Default Inventory policy
-        newRows.push(row.map(quoteValue).join(','));
+        newRows.push(row.map(smartQuote).join(','));
         addRowToTable(row);
       } else {
-        // Additional images: Minimal row, ensure all required fields
+        // Additional images: Minimal row, ensure no prices or costs
         const minimalRow = Array(headers.length).fill('');
         minimalRow[handleIndex] = handle;
         minimalRow[imageSrcIndex] = image.trim();
         minimalRow[headers.indexOf('Image Position')] = index + 1;
-        minimalRow[costIndex] = '0'; // Default Cost per item
-        minimalRow[priceIndex] = '0'; // Default Variant Price
-        minimalRow[fulfillmentIndex] = 'manual'; // Default Fulfillment service
-        minimalRow[inventoryPolicyIndex] = 'deny'; // Default Inventory policy
-        newRows.push(minimalRow.map(quoteValue).join(','));
+        newRows.push(minimalRow.map(smartQuote).join(','));
         addRowToTable(minimalRow);
       }
     });
@@ -88,9 +77,9 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     tbody.appendChild(tr);
   }
 
-  function quoteValue(value) {
-    if (value === null || value === undefined) return '""'; // Ensure null/undefined are empty quotes
-    return `"${String(value).replace(/"/g, '""')}"`; // Escape existing quotes and wrap in quotes
+  function smartQuote(value) {
+    if (value === null || value === undefined) return ''; // Return empty for null/undefined
+    return String(value).includes(',') ? `"${String(value).replace(/"/g, '""')}"` : value; // Quote if comma
   }
 
   // Set CSV data in the button's dataset
