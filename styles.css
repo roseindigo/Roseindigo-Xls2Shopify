@@ -2,75 +2,68 @@
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
-  margin: 0px; /* Adds margin to the page content */
+  margin: 0;
   padding: 0;
   background-color: #fff;
 }
 
-/* Header image */
 #header {
-  width: 100%; /* Full width */
-  height: auto; /* Maintain aspect ratio */
+  width: 100%;
+  height: auto;
   display: block;
-  margin: 0; /* Remove default margins */
-  padding: 0; /* Remove default padding */
+  margin: 0;
+  padding: 0;
 }
 
-#content{
+#content {
   margin: 20px;
+  height: calc(100vh - 40px); /* Adjust height to fill the viewport, minus margins */
+  display: flex;
+  flex-direction: column;
 }
+
 /* Page title */
 h1 {
   color: #333;
 }
 
-/* Textarea for data input */
 textarea {
   width: 100%;
+  height: 150px;
   margin-bottom: 20px;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 14px;
+  padding: 10px;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Input field styling */
 input[type="text"] {
-  width: 100%; /* Make it take full width */
-  max-width: 400px; /* Limit the maximum width */
-  padding: 10px; /* Add padding for a nicer look */
-  font-size: 16px; /* Increase font size for better readability */
-  border: 1px solid #CCC; /* Subtle border */
-  border-radius: 5px; /* Rounded corners */
-  margin-bottom: 20px; /* Add space below the field */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a light shadow */
-}
-
-
-textarea {
   width: 100%;
-  height: 150px; /* Set a fixed height for better usability */
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #CCC;
+  border-radius: 5px;
   margin-bottom: 20px;
-  white-space: nowrap; /* Prevent text wrapping */
-  overflow-x: auto; /* Enable horizontal scrolling */
-  overflow-y: auto; /* Enable vertical scrolling */
-  font-family: monospace; /* Use a monospace font for alignment */
-  font-size: 14px; /* Adjust font size for readability */
-  padding: 10px; /* Add padding for better readability */
-  border: 1px solid #CCC; /* Add a subtle border */
-  border-radius: 5px; /* Add rounded corners */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add light shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Focus state for the input field */
 input[type="text"]:focus {
-  border-color: #007BFF; /* Highlight border on focus */
-  outline: none; /* Remove default outline */
-  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3); /* Add a glow effect */
+  border-color: #7779B1;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
-/* Buttons */
 button {
   padding: 10px 20px;
   margin-right: 10px;
   border: none;
-  background-color: #007BFF;
+  background-color: #FF9601;
   color: white;
   font-size: 16px;
   cursor: pointer;
@@ -82,28 +75,39 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Table styles */
 table {
-  width: 100%;
+  width: 100%; /* Full width */
+  flex: 1; /* Allow the table to grow to fill the remaining height */
   border-collapse: collapse;
-  margin-top: 20px;
+  margin: 0;
+  font-size: 14px;
+  background-color: #7779B1;
+  border-radius: 5px;
 }
 
-table th,
-table td {
-  border: 1px solid #CCC;
-  padding: 10px;
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
   text-align: left;
+  white-space: nowrap;
 }
 
 table th {
-  background-color: #F7F7F7;
+  background-color: #A3A3CF;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
-/* Scrollable container */
-.scrollable {
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid #CCC;
-  border-radius: 5px;
+table td {
+  background-color: #ffffff;
+}
+
+table tr:nth-child(even) td {
+  background-color: #fcf4f8;
+}
+
+table tr:hover td {
+  background-color: #d8e8ff;
+  transition: background-color 0.3s;
 }
