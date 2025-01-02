@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopify CSV Generator</title>
+</head>
+<body>
+  <h1>Shopify CSV Generator</h1>
+  <p>Paste your Excel-like data below (tab-separated):</p>
+  <textarea id="inputData" rows="10" cols="80" placeholder="Paste your data here"></textarea>
+  <br><br>
+  <button id="generateCSV">Generate CSV</button>
+  <button id="downloadCSV" disabled>Download CSV</button>
+  <h3>Output:</h3>
+  <textarea id="outputData" rows="10" cols="80" readonly></textarea>
+
+  <script src="script.js"></script>
+</body>
+</html>
