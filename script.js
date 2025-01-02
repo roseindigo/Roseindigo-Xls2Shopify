@@ -61,6 +61,11 @@ document.getElementById('generateCSV').addEventListener('click', () => {
         minimalRow[handleIndex] = handle;
         minimalRow[imageSrcIndex] = image.trim();
         minimalRow[headers.indexOf('Image Position')] = index + 1;
+
+        // Explicitly leave numeric fields blank
+        if (costIndex !== -1) minimalRow[costIndex] = ''; // Cost per item
+        if (priceIndex !== -1) minimalRow[priceIndex] = ''; // Variant Price
+
         newRows.push(minimalRow.map(smartQuote).join(','));
         addRowToTable(minimalRow);
       }
