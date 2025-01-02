@@ -4,17 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopify CSV Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:disabled {
+      background-color: #CCC;
+      cursor: not-allowed;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table th, table td {
+      border: 1px solid #CCC;
+      padding: 10px;
+      text-align: left;
+    }
+    table th {
+      background-color: #F7F7F7;
+    }
+    .scrollable {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #CCC;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
   <h1>Shopify CSV Generator</h1>
   <p>Paste your Excel-like data below (tab-separated):</p>
-  <textarea id="inputData" rows="10" cols="80" placeholder="Paste your data here"></textarea>
-  <br><br>
+  <textarea id="inputData" rows="10" placeholder="Paste your data here"></textarea>
+  <br>
   <button id="generateCSV">Generate CSV</button>
   <button id="downloadCSV" disabled>Download CSV</button>
-  <h3>Output:</h3>
-  <textarea id="outputData" rows="10" cols="80" readonly></textarea>
-
+  <h3>Preview:</h3>
+  <div class="scrollable">
+    <table id="previewTable">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
