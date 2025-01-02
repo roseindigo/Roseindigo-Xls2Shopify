@@ -17,8 +17,8 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const handleIndex = headers.indexOf('Handle');
   const costIndex = headers.indexOf('Cost per item');
   const priceIndex = headers.indexOf('Variant Price');
-  // const fulfillmentIndex = headers.indexOf('Fulfillment service');
-  // const inventoryPolicyIndex = headers.indexOf('Inventory policy');
+  const fulfillmentIndex = headers.indexOf('Fulfillment service');
+  const inventoryPolicyIndex = headers.indexOf('Inventory policy');
 
   if (imageSrcIndex === -1 || handleIndex === -1) {
     alert('Required columns (Handle, Image Src) not found!');
@@ -27,8 +27,8 @@ document.getElementById('generateCSV').addEventListener('click', () => {
 
   // Add missing columns if not present
   if (!headers.includes('Image Position')) headers.push('Image Position');
-  // if (fulfillmentIndex === -1) headers.push('Fulfillment service');
-  // if (inventoryPolicyIndex === -1) headers.push('Inventory policy');
+  if (fulfillmentIndex === -1) headers.push('Fulfillment service');
+  if (inventoryPolicyIndex === -1) headers.push('Inventory policy');
 
   const newRows = [headers.map(quoteValue).join(',')];
   const tbody = previewTable.querySelector('tbody');
@@ -58,20 +58,20 @@ document.getElementById('generateCSV').addEventListener('click', () => {
         row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
         row[costIndex] = row[costIndex] || '0'; // Default Cost per item
         row[priceIndex] = row[priceIndex] || '0'; // Default Variant Price
-        // row[fulfillmentIndex] = row[fulfillmentIndex] || 'manual'; // Default Fulfillment service
-        // row[inventoryPolicyIndex] = row[inventoryPolicyIndex] || 'deny'; // Default Inventory policy
+        row[fulfillmentIndex] = row[fulfillmentIndex] || 'manual'; // Default Fulfillment service
+        row[inventoryPolicyIndex] = row[inventoryPolicyIndex] || 'deny'; // Default Inventory policy
         newRows.push(row.map(quoteValue).join(','));
         addRowToTable(row);
       } else {
-        // Additional images: Minimal row, ensure empty fields
+        // Additional images: Minimal row, ensure all required fields
         const minimalRow = Array(headers.length).fill('');
         minimalRow[handleIndex] = handle;
         minimalRow[imageSrcIndex] = image.trim();
         minimalRow[headers.indexOf('Image Position')] = index + 1;
         minimalRow[costIndex] = '0'; // Default Cost per item
         minimalRow[priceIndex] = '0'; // Default Variant Price
-        // minimalRow[fulfillmentIndex] = 'manual'; // Default Fulfillment service
-        // minimalRow[inventoryPolicyIndex] = 'deny'; // Default Inventory policy
+        minimalRow[fulfillmentIndex] = 'manual'; // Default Fulfillment service
+        minimalRow[inventoryPolicyIndex] = 'deny'; // Default Inventory policy
         newRows.push(minimalRow.map(quoteValue).join(','));
         addRowToTable(minimalRow);
       }
