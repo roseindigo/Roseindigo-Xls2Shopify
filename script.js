@@ -15,18 +15,22 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   // Find relevant column indices
   const imageSrcIndex = headers.indexOf('Image Src');
   const handleIndex = headers.indexOf('Handle');
+  const costIndex = headers.indexOf('Cost per item');
+  const priceIndex = headers.indexOf('Variant Price');
+  // const fulfillmentIndex = headers.indexOf('Fulfillment service');
+  // const inventoryPolicyIndex = headers.indexOf('Inventory policy');
 
   if (imageSrcIndex === -1 || handleIndex === -1) {
     alert('Required columns (Handle, Image Src) not found!');
     return;
   }
 
-  // Add "Image Position" if not present
-  if (!headers.includes('Image Position')) {
-    headers.push('Image Position');
-  }
+  // Add missing columns if not present
+  if (!headers.includes('Image Position')) headers.push('Image Position');
+  // if (fulfillmentIndex === -1) headers.push('Fulfillment service');
+  // if (inventoryPolicyIndex === -1) headers.push('Inventory policy');
 
-  const newRows = [headers.join(',')];
+  const newRows = [headers.map(quoteValue).join(',')];
   const tbody = previewTable.querySelector('tbody');
   const thead = previewTable.querySelector('thead');
 
@@ -52,15 +56,23 @@ document.getElementById('generateCSV').addEventListener('click', () => {
       if (index === 0) {
         // First image: Full row
         row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
-        newRows.push(row.join(','));
+        row[costIndex] = row[costIndex] || '0'; // Default Cost per item
+        row[priceIndex] = row[priceIndex] || '0'; // Default Variant Price
+        // row[fulfillmentIndex] = row[fulfillmentIndex] || 'manual'; // Default Fulfillment service
+        // row[inventoryPolicyIndex] = row[inventoryPolicyIndex] || 'deny'; // Default Inventory policy
+        newRows.push(row.map(quoteValue).join(','));
         addRowToTable(row);
       } else {
-        // Additional images: Minimal row
+        // Additional images: Minimal row, ensure empty fields
         const minimalRow = Array(headers.length).fill('');
         minimalRow[handleIndex] = handle;
         minimalRow[imageSrcIndex] = image.trim();
         minimalRow[headers.indexOf('Image Position')] = index + 1;
-        newRows.push(minimalRow.join(','));
+        minimalRow[costIndex] = '0'; // Default Cost per item
+        minimalRow[priceIndex] = '0'; // Default Variant Price
+        // minimalRow[fulfillmentIndex] = 'manual'; // Default Fulfillment service
+        // minimalRow[inventoryPolicyIndex] = 'deny'; // Default Inventory policy
+        newRows.push(minimalRow.map(quoteValue).join(','));
         addRowToTable(minimalRow);
       }
     });
@@ -76,8 +88,13 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     tbody.appendChild(tr);
   }
 
+  function quoteValue(value) {
+    if (value === null || value === undefined) return '""'; // Ensure null/undefined are empty quotes
+    return `"${String(value).replace(/"/g, '""')}"`; // Escape existing quotes and wrap in quotes
+  }
+
   // Set CSV data in the button's dataset
-  downloadCSV.dataset.csvData = newRows.join('\n');
+  downloadCSV.dataset.csvData = '\ufeff' + newRows.join('\n'); // Add BOM for UTF-8 encoding
 
   // Enable download button
   downloadCSV.disabled = false;
@@ -91,7 +108,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
     return;
   }
 
-  // Create a blob and download it as a CSV file
+  // Create a blob with UTF-8 encoding
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
 
