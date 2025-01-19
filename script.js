@@ -6,6 +6,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const baseURL = document.getElementById('baseURL').value.trim(); // Replace with your base URL
   // Retrieve the discount value and ensure it's a number
   const discount = parseFloat(document.getElementById('discount').value) || 0;
+ 
 
   if (!inputData.trim()) {
     alert('Veuillez coller vos données dans le champ prévu.');
@@ -150,4 +151,19 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
   document.body.removeChild(a); // Remove anchor after clicking
 
   URL.revokeObjectURL(url); // Clean up
+});
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Define the version number
+  const scriptVersion = '1.0.2';
+
+  // Display the version number in the div with ID 'scriptVersion'
+  const versionDiv = document.getElementById('scriptVersion');
+  if (versionDiv) {
+    versionDiv.textContent = `Script Version: ${scriptVersion}`;
+  } else {
+    console.error('Element with ID "scriptVersion" not found.');
+  }
 });

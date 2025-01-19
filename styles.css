@@ -4,110 +4,155 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #fff;
-}
-
-#header {
-  width: 100%;
-  height: auto;
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-
-#content {
-  margin: 20px;
-  height: calc(100vh - 40px); /* Adjust height to fill the viewport, minus margins */
-  display: flex;
-  flex-direction: column;
-}
-
-/* Page title */
-h1 {
+  background-color: white; /* Ensure the page background is white */
   color: #333;
 }
 
+/* Ensure the header image scales properly */
+#header {
+  width: 100%; /* Make the image responsive */
+  max-width: 100%; /* Prevent the image from exceeding the viewport width */
+  height: auto; /* Maintain the image's aspect ratio */
+  display: block; /* Remove any inline alignment issues */
+  margin: 0 auto; /* Center the image */
+}
+/* Form container styles */
+.form-container {
+  width: 100%;
+  max-width: 1200px; /* Limit the form width for better readability */
+  margin: 20px auto; /* Center the form */
+  background-color: #f9f9f9; /* Light background for the form */
+  border: 1px solid #ccc; /* Add a border around the form */
+  border-radius: 10px; /* Slightly rounded corners */
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+}
+
+/* Headings inside the form */
+h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+#scriptVersion {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Labels and inputs */
+form label {
+  display: block; /* Ensure labels appear above inputs */
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
 textarea {
-  width: 100%;
-  height: 150px;
-  margin-bottom: 20px;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: auto;
-  font-family: monospace;
+  width: 100%; /* Full-width inputs */
+  padding: 10px;
   font-size: 14px;
-  padding: 10px;
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  margin-bottom: 20px; /* Consistent spacing between fields */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
 
-input[type="text"] {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #CCC;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+textarea {
+  height: 120px; /* Adjust textarea height */
+  resize: vertical; /* Allow vertical resizing only */
 }
 
-input[type="text"]:focus {
-  border-color: #7779B1;
+input:focus,
+textarea:focus {
+  border-color: #7779b1;
   outline: none;
   box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
+/* Buttons */
 button {
-  padding: 10px 20px;
-  margin-right: 10px;
+  padding: 12px 20px;
   border: none;
-  background-color: #FF9601;
+  background-color: #ff9601;
   color: white;
   font-size: 16px;
   cursor: pointer;
   border-radius: 5px;
+  transition: background-color 0.3s ease;
+  width: 100%; /* Full width buttons */
+  margin-bottom: 10px; /* Add spacing between buttons */
+}
+
+button:hover {
+  background-color: #e68a00;
 }
 
 button:disabled {
-  background-color: #CCC;
+  background-color: #ccc;
   cursor: not-allowed;
 }
 
+/* Button container */
+.button-container {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 10px; /* Add consistent spacing between buttons */
+}
+
+
+/* Table styling */
 table {
   width: 100%; /* Full width */
-  flex: 1; /* Allow the table to grow to fill the remaining height */
-  border-collapse: collapse;
-  margin: 0;
+  border-collapse: collapse; /* Remove gaps between cells */
+  margin-top: 20px;
   font-size: 14px;
-  background-color: #7779B1;
-  border-radius: 5px;
+  background-color: white; /* White background for clarity */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  overflow: hidden;
 }
 
 table th, table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #ddd; /* Light border between cells */
+  padding: 10px;
   text-align: left;
-  white-space: nowrap;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 table th {
-  background-color: #A3A3CF;
-  color: #fff;
+  background-color: #5a67d8; /* Light purple header background */
+  color: #fff; /* White text for header */
   text-transform: uppercase;
   font-weight: bold;
+  position: sticky;
+  top: 0; /* Sticky header for scrolling tables */
+  z-index: 2;
 }
 
 table td {
-  background-color: #ffffff;
+  background-color: #ffffff; /* White background for cells */
 }
 
 table tr:nth-child(even) td {
-  background-color: #fcf4f8;
+  background-color: #f9f9f9; /* Alternating row color */
 }
 
 table tr:hover td {
-  background-color: #d8e8ff;
-  transition: background-color 0.3s;
+  background-color: #e9f2ff; /* Highlight on hover */
+  transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Scrollable container for the table */
+.scrollable {
+  overflow-x: auto; /* Allow horizontal scrolling */
+  border: 1px solid #ddd; /* Border around the scrollable area */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px;
+  background-color: #fafafa; /* Light gray background for the table container */
 }
