@@ -4,6 +4,8 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const previewTable = document.getElementById('previewTable');
   const downloadCSV = document.getElementById('downloadCSV');
   const baseURL = document.getElementById('baseURL').value.trim(); // Replace with your base URL
+  // Retrieve the discount value and ensure it's a number
+  const discount = parseFloat(document.getElementById('discount').value) || 0;
 
   if (!inputData.trim()) {
     alert('Veuillez coller vos données dans le champ prévu.');
@@ -52,35 +54,47 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   thead.appendChild(headerRow);
 
   // Process each row
-  rows.slice(1).forEach(row => {
-    const handle = row[handleIndex];
-    const images = row[imageSrcIndex]?.split(';') || [];
+  // Process each row
+rows.slice(1).forEach(row => {
+  const handle = row[handleIndex];
+  const images = row[imageSrcIndex]?.split(';') || [];
 
-    images.forEach((image, index) => {
-      const fullImageUrl = baseURL + image.trim(); // Prepend the base URL to the image URL
+  // Apply the discount to the Variant Price field
+  if (priceIndex !== -1) {
+    const originalPrice = parseFloat(row[priceIndex]) || 0; // Get the original price
+    const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2); // Apply discount
+    row[priceIndex] = discountedPrice; // Update the price in the row
+  }
 
-      if (index === 0) {
-        // First image: Full row
-        row[imageSrcIndex] = fullImageUrl; // Update the 'Image Src' cell to contain the full URL
-        row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
-        newRows.push(row.map(smartQuote).join(',')); // Add the row to the CSV
-        addRowToTable(row); // Display the row in the preview table
-      } else {
-        // Additional images: Minimal row, ensure no prices or costs
-        const minimalRow = Array(headers.length).fill('');
-        minimalRow[handleIndex] = handle;
-        minimalRow[imageSrcIndex] = fullImageUrl; // Use the full URL
-        minimalRow[headers.indexOf('Image Position')] = index + 1;
+  images.forEach((image, index) => {
+    // Ensure the file extension is lowercase
+    const normalizedImage = image.trim().replace(/\.[^/.]+$/, ext => ext.toLowerCase());
 
-        // Explicitly leave numeric fields blank
-        if (costIndex !== -1) minimalRow[costIndex] = ''; // Cost per item
-        if (priceIndex !== -1) minimalRow[priceIndex] = ''; // Variant Price
+    // Prepend the base URL to the normalized image URL
+    const fullImageUrl = baseURL + normalizedImage;
 
-        newRows.push(minimalRow.map(smartQuote).join(','));
-        addRowToTable(minimalRow);
-      }
-    });
+    if (index === 0) {
+      // First image: Full row
+      row[imageSrcIndex] = fullImageUrl; // Update the 'Image Src' cell to contain the full URL
+      row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
+      newRows.push(row.map(smartQuote).join(',')); // Add the row to the CSV
+      addRowToTable(row); // Display the row in the preview table
+    } else {
+      // Additional images: Minimal row, ensure no prices or costs
+      const minimalRow = Array(headers.length).fill('');
+      minimalRow[handleIndex] = handle;
+      minimalRow[imageSrcIndex] = fullImageUrl; // Use the full URL
+      minimalRow[headers.indexOf('Image Position')] = index + 1;
+
+      // Explicitly leave numeric fields blank
+      if (costIndex !== -1) minimalRow[costIndex] = ''; // Cost per item
+      if (priceIndex !== -1) minimalRow[priceIndex] = ''; // Variant Price
+
+      newRows.push(minimalRow.map(smartQuote).join(','));
+      addRowToTable(minimalRow);
+    }
   });
+});
 
   function addRowToTable(rowData) {
     const tr = document.createElement('tr');
