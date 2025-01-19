@@ -3,6 +3,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const reference = document.getElementById('fileReference').value.trim();
   const previewTable = document.getElementById('previewTable');
   const downloadCSV = document.getElementById('downloadCSV');
+  const baseURL = document.getElementById('baseURL').value.trim(); // Replace with your base URL
 
   if (!inputData.trim()) {
     alert('Veuillez coller vos données dans le champ prévu.');
@@ -56,17 +57,19 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     const images = row[imageSrcIndex]?.split(';') || [];
 
     images.forEach((image, index) => {
+      const fullImageUrl = baseURL + image.trim(); // Prepend the base URL to the image URL
+
       if (index === 0) {
         // First image: Full row
-        row[imageSrcIndex] = image.trim(); // Update the 'Image Src' cell to contain only the first image
+        row[imageSrcIndex] = fullImageUrl; // Update the 'Image Src' cell to contain the full URL
         row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
         newRows.push(row.map(smartQuote).join(',')); // Add the row to the CSV
         addRowToTable(row); // Display the row in the preview table
-      }else {
+      } else {
         // Additional images: Minimal row, ensure no prices or costs
         const minimalRow = Array(headers.length).fill('');
         minimalRow[handleIndex] = handle;
-        minimalRow[imageSrcIndex] = image.trim();
+        minimalRow[imageSrcIndex] = fullImageUrl; // Use the full URL
         minimalRow[headers.indexOf('Image Position')] = index + 1;
 
         // Explicitly leave numeric fields blank
