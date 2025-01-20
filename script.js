@@ -3,10 +3,9 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const reference = document.getElementById('fileReference').value.trim();
   const previewTable = document.getElementById('previewTable');
   const downloadCSV = document.getElementById('downloadCSV');
-  const baseURL = document.getElementById('baseURL').value.trim(); // Replace with your base URL
-  // Retrieve the discount value and ensure it's a number
+  const baseURL = document.getElementById('baseURL').value.trim(); 
   const discount = parseFloat(document.getElementById('discount').value) || 0;
- 
+  const selectedSeason = document.getElementById('season').value; // Get the selected season
 
   if (!inputData.trim()) {
     alert('Veuillez coller vos données dans le champ prévu.');
@@ -18,7 +17,6 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     return;
   }
 
-  // Split rows by newline and columns by tabs
   const rows = inputData.split('\n').map(row => row.split('\t'));
   const headers = rows[0];
 
@@ -27,14 +25,12 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const handleIndex = headers.indexOf('Handle');
   const costIndex = headers.indexOf('Cost per item');
   const priceIndex = headers.indexOf('Variant Price');
+  const seasonIndex = headers.indexOf('Saison (product.metafields.custom.saison)');
 
-  if (imageSrcIndex === -1 || handleIndex === -1) {
-    alert('Les colonnes obligatoires (Handle, Image Src) sont introuvables !');
+  if (imageSrcIndex === -1 || handleIndex === -1 || seasonIndex === -1) {
+    alert('Les colonnes obligatoires (Handle, Image Src, Saison) sont introuvables !');
     return;
   }
-
-  // Add missing columns if not present
-  // if (!headers.includes('Image Position')) headers.push('Image Position');
 
   const newRows = [];
   const tbody = previewTable.querySelector('tbody');
@@ -55,47 +51,41 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   thead.appendChild(headerRow);
 
   // Process each row
-  // Process each row
-rows.slice(1).forEach(row => {
-  const handle = row[handleIndex];
-  const images = row[imageSrcIndex]?.split(';') || [];
+  rows.slice(1).forEach(row => {
+    const handle = row[handleIndex];
+    const images = row[imageSrcIndex]?.split(';') || [];
+    const season = row[seasonIndex]?.trim(); // Get the season for the product
 
-  // Apply the discount to the Variant Price field
-  if (priceIndex !== -1) {
-    const originalPrice = parseFloat(row[priceIndex]) || 0; // Get the original price
-    const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2); // Apply discount
-    row[priceIndex] = discountedPrice; // Update the price in the row
-  }
-
-  images.forEach((image, index) => {
-    // Ensure the file extension is lowercase
-    const normalizedImage = image.trim().replace(/\.[^/.]+$/, ext => ext.toLowerCase());
-
-    // Prepend the base URL to the normalized image URL
-    const fullImageUrl = baseURL + normalizedImage;
-
-    if (index === 0) {
-      // First image: Full row
-      row[imageSrcIndex] = fullImageUrl; // Update the 'Image Src' cell to contain the full URL
-      row[headers.indexOf('Image Position')] = index + 1; // Add Image Position
-      newRows.push(row.map(smartQuote).join(',')); // Add the row to the CSV
-      addRowToTable(row); // Display the row in the preview table
-    } else {
-      // Additional images: Minimal row, ensure no prices or costs
-      const minimalRow = Array(headers.length).fill('');
-      minimalRow[handleIndex] = handle;
-      minimalRow[imageSrcIndex] = fullImageUrl; // Use the full URL
-      minimalRow[headers.indexOf('Image Position')] = index + 1;
-
-      // Explicitly leave numeric fields blank
-      if (costIndex !== -1) minimalRow[costIndex] = ''; // Cost per item
-      if (priceIndex !== -1) minimalRow[priceIndex] = ''; // Variant Price
-
-      newRows.push(minimalRow.map(smartQuote).join(','));
-      addRowToTable(minimalRow);
+    // Apply the discount if the season matches the selected season
+    if (season === selectedSeason && priceIndex !== -1) {
+      const originalPrice = parseFloat(row[priceIndex]) || 0;
+      const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2);
+      row[priceIndex] = discountedPrice; // Update the price in the row
     }
+
+    images.forEach((image, index) => {
+      const normalizedImage = image.trim().replace(/\.[^/.]+$/, ext => ext.toLowerCase());
+      const fullImageUrl = baseURL + normalizedImage;
+
+      if (index === 0) {
+        row[imageSrcIndex] = fullImageUrl;
+        row[headers.indexOf('Image Position')] = index + 1;
+        newRows.push(row.map(smartQuote).join(','));
+        addRowToTable(row);
+      } else {
+        const minimalRow = Array(headers.length).fill('');
+        minimalRow[handleIndex] = handle;
+        minimalRow[imageSrcIndex] = fullImageUrl;
+        minimalRow[headers.indexOf('Image Position')] = index + 1;
+
+        if (costIndex !== -1) minimalRow[costIndex] = '';
+        if (priceIndex !== -1) minimalRow[priceIndex] = '';
+
+        newRows.push(minimalRow.map(smartQuote).join(','));
+        addRowToTable(minimalRow);
+      }
+    });
   });
-});
 
   function addRowToTable(rowData) {
     const tr = document.createElement('tr');
@@ -108,25 +98,23 @@ rows.slice(1).forEach(row => {
   }
 
   function smartQuote(value) {
-    if (value === null || value === undefined) return ''; // Return empty for null/undefined
-    return String(value).includes(',') ? `"${String(value).replace(/"/g, '""')}"` : value; // Quote if comma
+    if (value === null || value === undefined) return '';
+    return String(value).includes(',') ? `"${String(value).replace(/"/g, '""')}"` : value;
   }
 
-  // Generate a file name based on the reference and the current date/time
   const now = new Date();
-  const formattedDate = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-  const formattedTime = now.toTimeString().split(' ')[0]; // Format: HH:MM:SS
-  const sanitizedReference = reference.normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .replace(/[^a-zA-Z0-9-]/g, ''); // Remove special characters
+  const formattedDate = now.toISOString().split('T')[0];
+  const formattedTime = now.toTimeString().split(' ')[0];
+  const sanitizedReference = reference
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9-]/g, '');
 
   const fileName = `${formattedDate}-${formattedTime}-${sanitizedReference}.csv`;
 
-  // Set CSV data in the button's dataset
-  downloadCSV.dataset.csvData = '\ufeff' + newRows.join('\n'); // Add BOM for UTF-8 encoding
+  downloadCSV.dataset.csvData = '\ufeff' + newRows.join('\n');
   downloadCSV.dataset.fileName = fileName;
-
-  // Enable download button
   downloadCSV.disabled = false;
 });
 
@@ -139,18 +127,17 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
     return;
   }
 
-  // Create a blob with UTF-8 encoding
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement('a');
   a.href = url;
   a.download = fileName;
-  document.body.appendChild(a); // Append anchor to body
+  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a); // Remove anchor after clicking
+  document.body.removeChild(a);
 
-  URL.revokeObjectURL(url); // Clean up
+  URL.revokeObjectURL(url);
 });
 
 
