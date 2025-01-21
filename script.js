@@ -109,19 +109,18 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   }
 
 function escapeAndQuote(value) {
-  if (value === null || value === undefined || value === '') return '""'; // Handle empty values
+  if (value === null || value === undefined || value === '') return '""'; // Empty value
 
-  // Convert value to a string
   const stringValue = String(value);
 
+  // If already wrapped in quotes, remove them before processing
+  const unwrappedValue = stringValue.replace(/^"(.*)"$/, '$1');
+
   // Escape inner quotes
-  const escapedValue = stringValue.replace(/"/g, '""');
+  const escapedValue = unwrappedValue.replace(/"/g, '""');
 
-  // Wrap the escaped value in a single pair of double quotes
-  const finalValue = `"${escapedValue}"`;
-
-  console.log(`Original: ${value}, Escaped: ${escapedValue}, Final: ${finalValue}`);
-  return finalValue;
+  // Wrap the result in a single pair of quotes
+  return `"${escapedValue}"`;
 }
 
   const now = new Date();
