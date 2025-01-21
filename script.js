@@ -25,6 +25,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const handleIndex = headers.indexOf('Handle');
   const costIndex = headers.indexOf('Cost per item');
   const priceIndex = headers.indexOf('Variant Price');
+  const compareAtPriceIndex = headers.indexOf('Variant Compare At Price'); // Find Compare At Price column
   const seasonIndex = headers.indexOf('Saison (product.metafields.custom.saison)');
 
   if (imageSrcIndex === -1 || handleIndex === -1 || seasonIndex === -1) {
@@ -59,8 +60,18 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     // Apply the discount if the season matches the selected season
     if (season === selectedSeason && priceIndex !== -1) {
       const originalPrice = parseFloat(row[priceIndex]) || 0;
-      const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2);
+      const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2).replace(',', '.');
       row[priceIndex] = discountedPrice; // Update the price in the row
+    }
+
+    // Format the "Cost per item" field
+    if (costIndex !== -1 && row[costIndex]) {
+      row[costIndex] = parseFloat(row[costIndex]).toFixed(2).replace(',', '.');
+    }
+
+    // Format the "Variant Compare At Price" field
+    if (compareAtPriceIndex !== -1 && row[compareAtPriceIndex]) {
+      row[compareAtPriceIndex] = parseFloat(row[compareAtPriceIndex]).toFixed(2).replace(',', '.');
     }
 
     images.forEach((image, index) => {
@@ -80,6 +91,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
 
         if (costIndex !== -1) minimalRow[costIndex] = '';
         if (priceIndex !== -1) minimalRow[priceIndex] = '';
+        if (compareAtPriceIndex !== -1) minimalRow[compareAtPriceIndex] = ''; // Leave Compare At Price empty
 
         newRows.push(minimalRow.map(smartQuote).join(','));
         addRowToTable(minimalRow);
@@ -140,11 +152,9 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
   // Define the version number
-  const scriptVersion = '1.0.3';
+  const scriptVersion = '1.0.5';
 
   // Display the version number in the div with ID 'scriptVersion'
   const versionDiv = document.getElementById('scriptVersion');
