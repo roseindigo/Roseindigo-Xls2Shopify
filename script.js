@@ -39,7 +39,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   thead.innerHTML = '';
   tbody.innerHTML = '';
 
-  newRows.push(headers.map(escapeAndQuote).join(','));
+  newRows.push(headers.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to headers
   const headerRow = document.createElement('tr');
   headers.forEach(header => {
     const th = document.createElement('th');
@@ -53,16 +53,19 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     const images = row[imageSrcIndex]?.split(';') || [];
     const season = row[seasonIndex]?.trim();
 
+    // Apply the discount if the season matches the selected season
     if (season === selectedSeason && priceIndex !== -1) {
       const originalPrice = parseFloat(row[priceIndex]) || 0;
       const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2).replace(',', '.');
       row[priceIndex] = discountedPrice;
     }
 
+    // Format the "Cost per item" field
     if (costIndex !== -1 && row[costIndex]) {
       row[costIndex] = parseFloat(row[costIndex]).toFixed(2).replace(',', '.');
     }
 
+    // Format the "Variant Compare At Price" field
     if (compareAtPriceIndex !== -1 && row[compareAtPriceIndex]) {
       row[compareAtPriceIndex] = parseFloat(row[compareAtPriceIndex]).toFixed(2).replace(',', '.');
     }
@@ -74,7 +77,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
       if (index === 0) {
         row[imageSrcIndex] = fullImageUrl;
         row[headers.indexOf('Image Position')] = index + 1;
-        newRows.push(row.map(escapeAndQuote).join(','));
+        newRows.push(row.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to all fields in the row
         addRowToTable(row);
       } else {
         const minimalRow = Array(headers.length).fill('');
@@ -86,7 +89,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
         if (priceIndex !== -1) minimalRow[priceIndex] = '';
         if (compareAtPriceIndex !== -1) minimalRow[compareAtPriceIndex] = '';
 
-        newRows.push(minimalRow.map(escapeAndQuote).join(','));
+        newRows.push(minimalRow.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to all fields
         addRowToTable(minimalRow);
       }
     });
@@ -102,15 +105,25 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     tbody.appendChild(tr);
   }
 
-  function escapeAndQuote(value) {
-    if (value === null || value === undefined || value === '') return '""';
-    const escapedValue = String(value).replace(/"/g, '""');
-    return `"${escapedValue}"`;
+function escapeAndQuote(value) {
+  if (value === null || value === undefined || value === '') {
+    console.log(value, '-> Empty value quoted as ""');
+    return '""';
   }
+
+  // Escape inner quotes by replacing each " with ""
+  const escapedValue = String(value).replace(/"/g, '""');
+
+  // Wrap the result in a single pair of double quotes
+  const finalValue = `"${escapedValue}"`;
+
+  console.log(`Original: ${value}, Escaped Inner Quotes: ${escapedValue}, Final: ${finalValue}`);
+  return finalValue;
+}
 
   const now = new Date();
   const formattedDate = now.toISOString().split('T')[0];
-  const formattedTime = now.toTimeString().split(' ')[0];
+  const formattedTime = now.toTimeString().split(' ')[0].replace(/:/g, '_');
   const sanitizedReference = reference
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -147,7 +160,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.0.5';
+  const scriptVersion = '1.0.6';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
