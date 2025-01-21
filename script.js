@@ -36,10 +36,12 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const tbody = previewTable.querySelector('tbody');
   const thead = previewTable.querySelector('thead');
 
+  // Clear previous table
   thead.innerHTML = '';
   tbody.innerHTML = '';
 
-  newRows.push(headers.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to headers
+  // Push headers directly without escaping or quoting
+  newRows.push(headers.join(','));
   const headerRow = document.createElement('tr');
   headers.forEach(header => {
     const th = document.createElement('th');
@@ -48,6 +50,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   });
   thead.appendChild(headerRow);
 
+  // Process each row
   rows.slice(1).forEach(row => {
     const handle = row[handleIndex];
     const images = row[imageSrcIndex]?.split(';') || [];
@@ -77,7 +80,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
       if (index === 0) {
         row[imageSrcIndex] = fullImageUrl;
         row[headers.indexOf('Image Position')] = index + 1;
-        newRows.push(row.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to all fields in the row
+        newRows.push(row.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to rows only
         addRowToTable(row);
       } else {
         const minimalRow = Array(headers.length).fill('');
@@ -89,7 +92,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
         if (priceIndex !== -1) minimalRow[priceIndex] = '';
         if (compareAtPriceIndex !== -1) minimalRow[compareAtPriceIndex] = '';
 
-        newRows.push(minimalRow.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to all fields
+        newRows.push(minimalRow.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to rows only
         addRowToTable(minimalRow);
       }
     });
@@ -99,25 +102,25 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     const tr = document.createElement('tr');
     rowData.forEach(cellData => {
       const td = document.createElement('td');
-      td.textContent = cellData || '';
+      td.textContent = escapeAndQuote(cellData).slice(1, -1); // Remove outer quotes for display
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
   }
 
 function escapeAndQuote(value) {
-  if (value === null || value === undefined || value === '') {
-    console.log(value, '-> Empty value quoted as ""');
-    return '""';
-  }
+  if (value === null || value === undefined || value === '') return '""'; // Handle empty values
 
-  // Escape inner quotes by replacing each " with ""
-  const escapedValue = String(value).replace(/"/g, '""');
+  // Convert value to a string
+  const stringValue = String(value);
 
-  // Wrap the result in a single pair of double quotes
+  // Escape inner quotes
+  const escapedValue = stringValue.replace(/"/g, '""');
+
+  // Wrap the escaped value in a single pair of double quotes
   const finalValue = `"${escapedValue}"`;
 
-  console.log(`Original: ${value}, Escaped Inner Quotes: ${escapedValue}, Final: ${finalValue}`);
+  console.log(`Original: ${value}, Escaped: ${escapedValue}, Final: ${finalValue}`);
   return finalValue;
 }
 
@@ -160,7 +163,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.0.6';
+  const scriptVersion = '1.0.7';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
