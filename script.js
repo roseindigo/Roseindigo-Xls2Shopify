@@ -144,7 +144,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Define the version number
-  const scriptVersion = '1.0.2';
+  const scriptVersion = '1.0.3';
 
   // Display the version number in the div with ID 'scriptVersion'
   const versionDiv = document.getElementById('scriptVersion');
