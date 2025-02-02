@@ -74,15 +74,21 @@ function formatPrice(value_in) {
     const season = row[seasonIndex]?.trim();
     console.log("ROOWWWWWWWWW")
     // Apply discount if applicable
-    // if (season === selectedSeason && priceIndex !== -1) {
-      console.log("--Price Before:", row[priceIndex]); ///LLLLLLAAAA LDE PB 
-      const originalPrice = formatPrice(row[priceIndex]) || 0;
-      if (!isNaN(originalPrice) && originalPrice > 0) {
-        row[priceIndex] = formatPrice(originalPrice * (1 - discount / 100));
-      }
-      console.log("--Price After:", row[priceIndex]);
-    // }
+    console.log("Processing Row: ", row);
+    console.log("--Season:", season, "| Selected Season:", selectedSeason);
 
+    const originalPrice = formatPrice(row[priceIndex]) || 0;
+
+    if (!isNaN(originalPrice) && originalPrice > 0) {
+        if (season === selectedSeason) {
+            console.log("--Applying Discount: ", discount, "%");
+            row[priceIndex] = formatPrice(originalPrice * (1 - discount / 100));
+            console.log("--Price After Discount:", row[priceIndex]);
+        } else {
+            console.log("--No Discount, Keeping Original Price");
+            row[priceIndex] = formatPrice(originalPrice);
+        }
+    }
 
     // Format "Variant Compare At Price"
     if (compareAtPriceIndex !== -1) {
@@ -181,7 +187,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.0.9';
+  const scriptVersion = '1.1.0';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
