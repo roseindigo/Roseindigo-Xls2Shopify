@@ -50,27 +50,51 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   });
   thead.appendChild(headerRow);
 
+function formatPrice(value_in) {
+    console.log("value_in:", value_in, "| Type:", typeof value_in);
+    let num;
+    // If value is a string, format it before conversion
+    if (typeof value_in === "string") {
+        value_in = value_in.replace(",", "."); // Ensure decimal separator is dot
+        num = parseFloat(value_in);
+        console.log("String -> num:", num);
+
+    }else{
+      num = value_in;
+    }
+
+    console.log("Parsed number:", num, "| Type:", typeof num);
+    return num.toFixed(2); // Ensure output always has two decimal places
+}
+
   // Process each row
   rows.slice(1).forEach(row => {
     const handle = row[handleIndex];
     const images = row[imageSrcIndex]?.split(';') || [];
     const season = row[seasonIndex]?.trim();
-
-    // Apply the discount if the season matches the selected season
-    if (season === selectedSeason && priceIndex !== -1) {
+    console.log("ROOWWWWWWWWW")
+    // Apply discount if applicable
+    // if (season === selectedSeason && priceIndex !== -1) {
+      console.log("--Price Before:", row[priceIndex]);
       const originalPrice = parseFloat(row[priceIndex]) || 0;
-      const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2).replace(',', '.');
-      row[priceIndex] = discountedPrice;
+      if (!isNaN(originalPrice) && originalPrice > 0) {
+        row[priceIndex] = formatPrice(originalPrice * (1 - discount / 100));
+      }
+      console.log("--Price After:", row[priceIndex]);
+    // }
+
+
+    // Format "Variant Compare At Price"
+    if (compareAtPriceIndex !== -1) {
+      console.log("--Compare Price Before:", row[compareAtPriceIndex]);
+      row[compareAtPriceIndex] = formatPrice(row[compareAtPriceIndex]);
+      console.log("--Compare Price After:", row[compareAtPriceIndex]);
     }
 
-    // Format the "Cost per item" field
-    if (costIndex !== -1 && row[costIndex]) {
-      row[costIndex] = parseFloat(row[costIndex]).toFixed(2).replace(',', '.');
-    }
-
-    // Format the "Variant Compare At Price" field
-    if (compareAtPriceIndex !== -1 && row[compareAtPriceIndex]) {
-      row[compareAtPriceIndex] = parseFloat(row[compareAtPriceIndex]).toFixed(2).replace(',', '.');
+    if (costIndex !== -1) {
+      console.log("--Cost Before:", row[costIndex]);
+      row[costIndex] = formatPrice(row[costIndex]);
+      console.log("--Cost After:", row[costIndex]);
     }
 
     images.forEach((image, index) => {
@@ -108,20 +132,15 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     tbody.appendChild(tr);
   }
 
-function escapeAndQuote(value) {
-  if (value === null || value === undefined || value === '') return '""'; // Empty value
+  function escapeAndQuote(value) {
+    if (value === null || value === undefined || value === '') return '""'; // Empty value
 
-  const stringValue = String(value);
+    const stringValue = String(value);
+    const unwrappedValue = stringValue.replace(/^"(.*)"$/, '$1'); // Remove quotes
+    const escapedValue = unwrappedValue.replace(/"/g, '""');
 
-  // If already wrapped in quotes, remove them before processing
-  const unwrappedValue = stringValue.replace(/^"(.*)"$/, '$1');
-
-  // Escape inner quotes
-  const escapedValue = unwrappedValue.replace(/"/g, '""');
-
-  // Wrap the result in a single pair of quotes
-  return `"${escapedValue}"`;
-}
+    return `"${escapedValue}"`; // Wrap in quotes
+  }
 
   const now = new Date();
   const formattedDate = now.toISOString().split('T')[0];
