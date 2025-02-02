@@ -75,8 +75,8 @@ function formatPrice(value_in) {
     console.log("ROOWWWWWWWWW")
     // Apply discount if applicable
     // if (season === selectedSeason && priceIndex !== -1) {
-      console.log("--Price Before:", row[priceIndex]);
-      const originalPrice = parseFloat(row[priceIndex]) || 0;
+      console.log("--Price Before:", row[priceIndex]); ///LLLLLLAAAA LDE PB 
+      const originalPrice = formatPrice(row[priceIndex]) || 0;
       if (!isNaN(originalPrice) && originalPrice > 0) {
         row[priceIndex] = formatPrice(originalPrice * (1 - discount / 100));
       }
@@ -181,7 +181,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.0.7';
+  const scriptVersion = '1.0.9';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
