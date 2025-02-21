@@ -52,20 +52,31 @@ document.getElementById('generateCSV').addEventListener('click', () => {
 
 function formatPrice(value_in) {
     console.log("value_in:", value_in, "| Type:", typeof value_in);
+
+    if (value_in == null || value_in === "" || value_in === undefined) {
+        console.warn("⚠️ Warning: Received an invalid value, returning '0.00'");
+        return "0.00"; // Prevents toFixed() error
+    }
+
     let num;
-    // If value is a string, format it before conversion
+
     if (typeof value_in === "string") {
         value_in = value_in.replace(",", "."); // Ensure decimal separator is dot
         num = parseFloat(value_in);
         console.log("String -> num:", num);
+    } else {
+        num = value_in;
+    }
 
-    }else{
-      num = value_in;
+    if (isNaN(num)) {
+        console.warn("⚠️ Warning: Invalid number, returning '0.00'");
+        return "0.00";
     }
 
     console.log("Parsed number:", num, "| Type:", typeof num);
-    return num.toFixed(2); // Ensure output always has two decimal places
+    return num.toFixed(2); // Always returns a string with two decimals
 }
+
 
   // Process each row
   rows.slice(1).forEach(row => {
@@ -187,7 +198,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.1.0';
+  const scriptVersion = '1.1.1';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
