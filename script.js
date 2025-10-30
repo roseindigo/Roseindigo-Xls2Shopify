@@ -36,9 +36,23 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const tbody = previewTable.querySelector('tbody');
   const thead = previewTable.querySelector('thead');
 
-  // Clear previous table
+  // Error tracking
+  const errors = {
+    '#REF!': 0,
+    '#VALUE!': 0,
+    '#DIV/0!': 0,
+    '#NAME?': 0,
+    '#N/A': 0,
+    '#NUM!': 0,
+    '#NULL!': 0,
+    '#GETTING_DATA': 0
+  };
+  const errorCells = []; // Store {row, col, value, type} for highlighting
+
+  // Clear previous table and warnings
   thead.innerHTML = '';
   tbody.innerHTML = '';
+  clearWarningPanel();
 
   // Push headers directly without escaping or quoting
   newRows.push(headers.join(','));
@@ -49,6 +63,22 @@ document.getElementById('generateCSV').addEventListener('click', () => {
     headerRow.appendChild(th);
   });
   thead.appendChild(headerRow);
+
+  // Helper function to detect Excel errors
+  function detectError(value) {
+    if (value == null || value === undefined) return null;
+    const strValue = String(value).trim();
+
+    const errorTypes = ['#REF!', '#VALUE!', '#DIV/0!', '#NAME?', '#N/A', '#NUM!', '#NULL!', '#GETTING_DATA'];
+
+    for (const errorType of errorTypes) {
+      if (strValue === errorType) {
+        return errorType;
+      }
+    }
+
+    return null;
+  }
 
 function formatPrice(value_in) {
     console.log("value_in:", value_in, "| Type:", typeof value_in);
@@ -141,9 +171,22 @@ function formatPrice(value_in) {
 
   function addRowToTable(rowData) {
     const tr = document.createElement('tr');
-    rowData.forEach(cellData => {
+    const rowIndex = tbody.children.length;
+
+    rowData.forEach((cellData, colIndex) => {
       const td = document.createElement('td');
-      td.textContent = escapeAndQuote(cellData).slice(1, -1); // Remove outer quotes for display
+      const displayValue = escapeAndQuote(cellData).slice(1, -1); // Remove outer quotes for display
+      td.textContent = displayValue;
+
+      // Check for errors
+      const errorType = detectError(cellData);
+      if (errorType) {
+        td.classList.add('error-cell');
+        td.title = `Excel Error: ${errorType}`;
+        errors[errorType]++;
+        errorCells.push({ row: rowIndex, col: colIndex, value: cellData, type: errorType });
+      }
+
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -173,7 +216,51 @@ function formatPrice(value_in) {
   downloadCSV.dataset.csvData = '\ufeff' + newRows.join('\n');
   downloadCSV.dataset.fileName = fileName;
   downloadCSV.disabled = false;
+
+  // Display warning panel if errors found
+  displayWarningPanel(errors, errorCells.length);
 });
+
+// Helper function to clear warning panel
+function clearWarningPanel() {
+  const existingPanel = document.getElementById('warningPanel');
+  if (existingPanel) {
+    existingPanel.remove();
+  }
+}
+
+// Helper function to display warning panel
+function displayWarningPanel(errors, totalErrors) {
+  clearWarningPanel();
+
+  if (totalErrors === 0) return; // No errors, no panel
+
+  const panel = document.createElement('div');
+  panel.id = 'warningPanel';
+  panel.className = 'warning-panel';
+
+  const title = document.createElement('h3');
+  title.textContent = `⚠️ ${totalErrors} erreur${totalErrors > 1 ? 's' : ''} détectée${totalErrors > 1 ? 's' : ''}`;
+  panel.appendChild(title);
+
+  const errorList = document.createElement('ul');
+  for (const [errorType, count] of Object.entries(errors)) {
+    if (count > 0) {
+      const li = document.createElement('li');
+      li.textContent = `${errorType}: ${count} occurrence${count > 1 ? 's' : ''}`;
+      errorList.appendChild(li);
+    }
+  }
+  panel.appendChild(errorList);
+
+  const message = document.createElement('p');
+  message.textContent = 'Les cellules avec des erreurs sont surlignées en rouge dans le tableau.';
+  panel.appendChild(message);
+
+  // Insert panel before the preview table
+  const previewTable = document.getElementById('previewTable');
+  previewTable.parentNode.insertBefore(panel, previewTable);
+}
 
 document.getElementById('downloadCSV').addEventListener('click', () => {
   const csvData = document.getElementById('downloadCSV').dataset.csvData;
@@ -198,7 +285,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.1.1';
+  const scriptVersion = '1.2.0';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;

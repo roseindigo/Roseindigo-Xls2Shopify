@@ -156,3 +156,48 @@ table tr:hover td {
   padding: 10px;
   background-color: #fafafa; /* Light gray background for the table container */
 }
+
+/* Error cell styling */
+.error-cell {
+  background-color: #ffcccc !important; /* Light red background */
+  color: #cc0000; /* Dark red text */
+  font-weight: bold;
+  border: 2px solid #ff0000 !important; /* Red border */
+}
+
+.error-cell:hover {
+  background-color: #ff9999 !important; /* Darker red on hover */
+}
+
+/* Warning panel styling */
+.warning-panel {
+  background-color: #fff3cd; /* Light yellow background */
+  border: 2px solid #ffc107; /* Orange border */
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+.warning-panel h3 {
+  color: #856404; /* Dark yellow/brown */
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.warning-panel ul {
+  margin: 10px 0;
+  padding-left: 25px;
+  color: #856404;
+}
+
+.warning-panel li {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.warning-panel p {
+  margin: 10px 0 0 0;
+  color: #856404;
+  font-size: 14px;
+}
