@@ -25,6 +25,7 @@ document.getElementById('generateCSV').addEventListener('click', () => {
   const costIndex = headers.indexOf('Cost per item');
   const priceIndex = headers.indexOf('Variant Price');
   const compareAtPriceIndex = headers.indexOf('Variant Compare At Price');
+  const quantityIndex = headers.indexOf('Variant Inventory Qty');
   const seasonIndex = headers.indexOf('Saison (product.metafields.custom.saison)');
 
   if (imageSrcIndex === -1 || handleIndex === -1 || seasonIndex === -1) {
@@ -162,6 +163,7 @@ function formatPrice(value_in) {
         if (costIndex !== -1) minimalRow[costIndex] = '';
         if (priceIndex !== -1) minimalRow[priceIndex] = '';
         if (compareAtPriceIndex !== -1) minimalRow[compareAtPriceIndex] = '';
+        // Quantity is already empty in minimalRow, don't set it
 
         newRows.push(minimalRow.map(escapeAndQuote).join(',')); // Apply `escapeAndQuote` to rows only
         addRowToTable(minimalRow);
@@ -285,7 +287,7 @@ document.getElementById('downloadCSV').addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const scriptVersion = '1.2.0';
+  const scriptVersion = '1.2.1';
   const versionDiv = document.getElementById('scriptVersion');
   if (versionDiv) {
     versionDiv.textContent = `Script Version: ${scriptVersion}`;
